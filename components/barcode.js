@@ -2,16 +2,27 @@
 import React, { useEffect, useRef } from "react";
 import { useBarcode } from "next-barcode";
 import { jsPDF } from "jspdf";
-import "svg2pdf.js"; // this patches jsPDF with .svg()
+import "svg2pdf.js";
 import { Button } from "@/components/ui/button";
 
-function BarcodeItem({ user }) {
+function BarcodeItem({ users }) {
+  console.log("users", users);
+  let user = users[0];
+  console.log("user", user);
   const { inputRef: usernameInputRef } = useBarcode({ value: user.username });
   const { inputRef: passwordInputRef } = useBarcode({ value: user.password });
 
   const generatePDF = async () => {
     const usernameSvg = usernameInputRef.current;
     const passwordSvg = passwordInputRef.current;
+
+    // var usernameBBox = usernameSvg.getBBox();
+    // // console.log("XxY", usernameBBox.x + "x" + usernameBBox.y);
+    // console.log("size", usernameBBox.width + "x" + usernameBBox.height);
+
+    // var passwordBBox = passwordSvg.getBBox();
+    // // console.log("XxY", passwordBBox.x + "x" + passwordBBox.y);
+    // console.log("size", passwordBBox.width + "x" + passwordBBox.height);
 
     if (!usernameSvg?.innerHTML || !passwordSvg?.innerHTML) {
       console.error("Barcodes not generated yet");

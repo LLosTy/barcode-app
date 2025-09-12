@@ -1,6 +1,8 @@
+"use client";
 import Barcode from "@/components/barcode";
 import { TableDemo } from "@/components/table";
 import GeneratePass from "@/lib/generatePassword";
+import { useState } from "react";
 
 // const users = [
 //   {
@@ -54,30 +56,42 @@ import GeneratePass from "@/lib/generatePassword";
 //   },
 // ];
 
-const users = [
-  {
-    firstName: "John",
-    lastName: "Doe",
-    username: "john.doe",
-    password: "123456",
-    passwordTemporary: "123456",
-  },
-];
-
-users.map((user) => {
-  user.password = GeneratePass();
-});
+// const users = [
+//   {
+//     firstName: "John",
+//     lastName: "Doe",
+//     username: "john.doe",
+//     password: "123456",
+//     passwordTemporary: "123456",
+//   },
+// ];
 
 export default function Home() {
+  const [users, setUsers] = useState([
+    {
+      firstName: "Barbara",
+      lastName: "Hepworth",
+      username: "41341879413",
+    },
+  ]);
+
+  users.map((user) => {
+    user.password = GeneratePass();
+  });
+
+  const addUser = (newUser) => {
+    setUsers([...users, newUser]);
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start"></main>
-      <TableDemo users={users} />
-      <div>
-        {users.map((user) => (
-          <Barcode key={user.username} user={user} />
-        ))}
-      </div>
+    // <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start"></main>
+    // <TableDemo users={users} />
+    // <div>
+
+    <div className="font-sans grid grid-rows items-start justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+      <main className="flex flex-col gap-[32px] row-start-2"></main>
+      <TableDemo users={users} onAddUser={addUser} />
+      <Barcode users={users} />
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center"></footer>
     </div>
   );
