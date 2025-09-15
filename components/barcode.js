@@ -1,55 +1,114 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { useBarcode } from "next-barcode";
 import { jsPDF } from "jspdf";
 import "svg2pdf.js";
 import { Button } from "@/components/ui/button";
 
+function UserBarcodes({ user, onReady }) {
+  const { inputRef: usernameRef } = useBarcode({ value: user.username });
+  const { inputRef: passwordRef } = useBarcode({ value: user.password });
+
+  React.useEffect(() => {
+    if (usernameRef.current && passwordRef.current) {
+      onReady(user.username, {
+        usernameSvg: usernameRef.current,
+        passwordSvg: passwordRef.current,
+      });
+    }
+  }, [user.username, usernameRef, passwordRef, onReady]);
+
+  return (
+    <div className="hidden">
+      <svg ref={usernameRef} />
+      <svg ref={passwordRef} />
+    </div>
+  );
+}
+
 function BarcodeItem({ users }) {
-  console.log("users", users);
-  let user = users[0];
-  console.log("user", user);
-  const { inputRef: usernameInputRef } = useBarcode({ value: user.username });
-  const { inputRef: passwordInputRef } = useBarcode({ value: user.password });
+  const barcodeRefs = useRef({});
+
+  const handleReady = (username, svgs) => {
+    barcodeRefs.current[username] = svgs;
+  };
 
   const generatePDF = async () => {
-    const usernameSvg = usernameInputRef.current;
-    const passwordSvg = passwordInputRef.current;
-
-    // var usernameBBox = usernameSvg.getBBox();
-    // // console.log("XxY", usernameBBox.x + "x" + usernameBBox.y);
-    // console.log("size", usernameBBox.width + "x" + usernameBBox.height);
-
-    // var passwordBBox = passwordSvg.getBBox();
-    // // console.log("XxY", passwordBBox.x + "x" + passwordBBox.y);
-    // console.log("size", passwordBBox.width + "x" + passwordBBox.height);
-
-    if (!usernameSvg?.innerHTML || !passwordSvg?.innerHTML) {
-      console.error("Barcodes not generated yet");
-      alert("Please wait for barcodes to load before downloading");
-      return;
-    }
-
     const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    try {
-      console.log("Generating PDF...");
-      await doc.svg(usernameSvg, { x: 10, y: 10, width: 150, height: 50 });
-      await doc.svg(passwordSvg, { x: 10, y: 70, width: 150, height: 50 });
-      doc.save(`${user.username}_barcodes.pdf`);
-      console.log("PDF saved successfully");
-    } catch (err) {
-      console.error("SVG render error:", err);
-      alert("Error generating PDF. Please try again.");
+    // grid config
+    const margin = 20;
+    const barcodeWidth = 150;
+    const barcodeHeight = 50;
+    const spacing = 20; // increased a bit since no text
+
+    const usableWidth = pageWidth - 2 * margin;
+    const usableHeight = pageHeight - 2 * margin;
+
+    const itemWidth = barcodeWidth + spacing;
+    const itemHeight = barcodeHeight * 2 + spacing;
+
+    const itemsPerRow = Math.floor(usableWidth / itemWidth);
+    const rowsPerPage = Math.floor(usableHeight / itemHeight);
+    const itemsPerPage = itemsPerRow * rowsPerPage;
+
+    let itemsOnCurrentPage = 0;
+
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      const entry = barcodeRefs.current[user.username];
+
+      if (!entry) {
+        alert(`Barcode for ${user.username} not ready yet`);
+        return;
+      }
+
+      const { usernameSvg, passwordSvg } = entry;
+
+      if (itemsOnCurrentPage >= itemsPerPage) {
+        doc.addPage();
+        itemsOnCurrentPage = 0;
+      }
+
+      const row = Math.floor(itemsOnCurrentPage / itemsPerRow);
+      const col = itemsOnCurrentPage % itemsPerRow;
+
+      const x = margin + col * itemWidth;
+      const y = margin + row * itemHeight;
+
+      await doc.svg(usernameSvg, {
+        x,
+        y,
+        width: barcodeWidth,
+        height: barcodeHeight,
+      });
+
+      await doc.svg(passwordSvg, {
+        x,
+        y: y + barcodeHeight + 10,
+        width: barcodeWidth,
+        height: barcodeHeight,
+      });
+
+      itemsOnCurrentPage++;
     }
+
+    const filename =
+      users.length === 1
+        ? `${users[0].username}_barcodes.pdf`
+        : `${users.length}_users_barcodes.pdf`;
+
+    doc.save(filename);
   };
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <svg ref={usernameInputRef} />
-        <svg ref={passwordInputRef} />
-      </div>
+      {/* hidden SVGs */}
+      {users.map((user) => (
+        <UserBarcodes key={user.username} user={user} onReady={handleReady} />
+      ))}
 
       <Button onClick={generatePDF} className="w-full">
         Download PDF
