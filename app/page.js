@@ -2,7 +2,7 @@
 import Barcode from "@/components/barcode";
 import { TableDemo } from "@/components/table";
 import GeneratePass from "@/lib/generatePassword";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // const users = [
 //   {
@@ -160,9 +160,14 @@ export default function Home() {
     },
   ]);
 
-  users.map((user) => {
-    user.password = GeneratePass();
-  });
+  useEffect(() => {
+    setUsers((prev) =>
+      prev.map((user) => ({
+        ...user,
+        password: GeneratePass(),
+      }))
+    );
+  }, []);
 
   const addUser = (newUser) => {
     setUsers([...users, newUser]);
