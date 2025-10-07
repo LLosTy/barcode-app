@@ -2,9 +2,7 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -13,11 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
-export function TableDemo({ users, onAddUser }) {
+export function TableDemo({ users, onAddUser, onModifyUser }) {
   const [isAddingUserForm, setIsAddingUserForm] = useState(false);
-  // const [firstName, setFirstName] = useState("");
-  // const [lastName, setLastName] = useState("");
-  // const [UserName, setUserName] = useState("");
   const [form, setForm] = useState({
     firstName: "Barbara",
     lastName: "Hepworth",
@@ -28,6 +23,7 @@ export function TableDemo({ users, onAddUser }) {
     return (
       <div className={"flex flex-row gap-4"}>
         <Input
+          placeholder="First Name"
           value={form.firstName}
           onChange={(e) => {
             setForm({
@@ -37,6 +33,7 @@ export function TableDemo({ users, onAddUser }) {
           }}
         />
         <Input
+          placeholder="Last Name"
           value={form.lastName}
           onChange={(e) => {
             setForm({
@@ -46,6 +43,7 @@ export function TableDemo({ users, onAddUser }) {
           }}
         />
         <Input
+          placeholder="Username"
           value={form.username}
           onChange={(e) => {
             setForm({
@@ -54,18 +52,15 @@ export function TableDemo({ users, onAddUser }) {
             });
           }}
         />
-        <Button onClick={() => onAddUser(form)}>+</Button>
+        <Button variant="ghost" onClick={() => onAddUser(form)}>
+          ✅
+        </Button>
       </div>
     );
   }
 
-  const user = {
-    firstName: "John",
-    lastName: "Doe",
-    username: "john.doe",
-    password: "123456",
-    passwordTemporary: "123456",
-  };
+  const [editingUser, setEditingUser] = useState(null);
+
   return (
     <div className={"flex flex-col gap-4 w-full max-w-5xl"}>
       <Table>
@@ -80,13 +75,66 @@ export function TableDemo({ users, onAddUser }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.username}>
-              <TableCell className="font-medium">{user.firstName}</TableCell>
-              <TableCell>{user.lastName}</TableCell>
-              <TableCell>{user.username}</TableCell>
+          {users.map((user, index) => (
+            <TableRow key={user.id}>
+              <TableCell className="font-medium">
+                {editingUser == index ? (
+                  <Input
+                    value={user.firstName}
+                    className="w-auto"
+                    onChange={(event) => {
+                      onModifyUser("firstName", index, event.target.value);
+                    }}
+                  ></Input>
+                ) : (
+                  user.firstName
+                )}
+              </TableCell>
+              <TableCell>
+                {editingUser == index ? (
+                  <Input
+                    value={user.lastName}
+                    className="w-auto"
+                    onChange={(event) => {
+                      onModifyUser("lastName", index, event.target.value);
+                    }}
+                  ></Input>
+                ) : (
+                  user.lastName
+                )}
+              </TableCell>
+              <TableCell>
+                {editingUser == index ? (
+                  <Input
+                    value={user.username}
+                    className="w-auto"
+                    onChange={(event) => {
+                      onModifyUser("username", index, event.target.value);
+                    }}
+                  ></Input>
+                ) : (
+                  user.lastName
+                )}
+              </TableCell>
               <TableCell>{user.password}</TableCell>
               <TableCell className="text-right">NewPassword123*</TableCell>
+              <TableCell className="p-0">
+                {/* if user is adding and not editing, show pencil icon */}
+                {editingUser == null ? (
+                  <Button onClick={() => setEditingUser(index)} variant="ghost">
+                    ✏️
+                  </Button>
+                ) : (
+                  <></>
+                )}
+                {editingUser == index ? (
+                  <Button onClick={() => setEditingUser(null)} variant="ghost">
+                    ❌
+                  </Button>
+                ) : (
+                  <></>
+                )}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
