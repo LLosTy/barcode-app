@@ -6,10 +6,10 @@ Created to help move away from Excel-based barcode credential creation
 
 ## How to run
 
-### Git clone repo
+### Clone git repo
 
 ```bash
-git clone https://github.com/LLosTy/barcode-app
+git clone git@github.com:LLosTy/barcode-app.git
 ```
 
 ### Navigate to repo
