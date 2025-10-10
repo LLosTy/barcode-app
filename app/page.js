@@ -185,11 +185,7 @@ export default function Home() {
   };
 
   const modifyUser = (property, index, change) => {
-    //Treat the state array as immutable
-    //create a new array with the change values and update the state as a whole
-
     let updatedArr = users;
-    console.log(property, index, change);
     updatedArr[index][`${property}`] = change;
     setUsers([...updatedArr]);
   };

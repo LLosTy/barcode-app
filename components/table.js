@@ -14,9 +14,10 @@ import { useState } from "react";
 export function TableDemo({ users, onAddUser, onModifyUser }) {
   const [isAddingUserForm, setIsAddingUserForm] = useState(false);
   const [form, setForm] = useState({
-    firstName: "Barbara",
-    lastName: "Hepworth",
-    username: "41341879",
+    firstName: "",
+    lastName: "",
+    username: "",
+    id: crypto.randomUUID(),
   });
 
   function addUserForm() {
@@ -52,7 +53,18 @@ export function TableDemo({ users, onAddUser, onModifyUser }) {
             });
           }}
         />
-        <Button variant="ghost" onClick={() => onAddUser(form)}>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            onAddUser(form);
+            setForm({
+              firstName: "",
+              lastName: "",
+              username: "",
+              id: crypto.randomUUID(),
+            });
+          }}
+        >
           ✅
         </Button>
       </div>
@@ -62,7 +74,7 @@ export function TableDemo({ users, onAddUser, onModifyUser }) {
   const [editingUser, setEditingUser] = useState(null);
 
   return (
-    <div className={"flex flex-col gap-4 w-full max-w-5xl"}>
+    <div className={"flex flex-col gap-4 w-full max-w-7xl"}>
       <Table>
         {/* <TableCaption>A list of users.</TableCaption> */}
         <TableHeader>
@@ -113,7 +125,7 @@ export function TableDemo({ users, onAddUser, onModifyUser }) {
                     }}
                   ></Input>
                 ) : (
-                  user.lastName
+                  user.username
                 )}
               </TableCell>
               <TableCell>{user.password}</TableCell>
