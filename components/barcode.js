@@ -107,7 +107,7 @@ function BarcodeItem({ users }) {
     <div className="space-y-4">
       {/* hidden SVGs */}
       {users.map((user) => (
-        <UserBarcodes key={user.username} user={user} onReady={handleReady} />
+        <UserBarcodes key={user.id} user={user} onReady={handleReady} />
       ))}
 
       <Button onClick={generatePDF} className="w-full">
