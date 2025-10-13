@@ -11,12 +11,12 @@ function UserBarcodes({ user, onReady }) {
 
   React.useEffect(() => {
     if (usernameRef.current && passwordRef.current) {
-      onReady(user.username, {
+      onReady(user.id, {
         usernameSvg: usernameRef.current,
         passwordSvg: passwordRef.current,
       });
     }
-  }, [user.username, usernameRef, passwordRef, onReady]);
+  }, [user.id, usernameRef, passwordRef, onReady]);
 
   return (
     <div className="hidden">
@@ -29,8 +29,8 @@ function UserBarcodes({ user, onReady }) {
 function BarcodeItem({ users }) {
   const barcodeRefs = useRef({});
 
-  const handleReady = (username, svgs) => {
-    barcodeRefs.current[username] = svgs;
+  const handleReady = (id, svgs) => {
+    barcodeRefs.current[id] = svgs;
   };
 
   const generatePDF = async () => {
@@ -58,7 +58,7 @@ function BarcodeItem({ users }) {
 
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
-      const entry = barcodeRefs.current[user.username];
+      const entry = barcodeRefs.current[user.id];
 
       if (!entry) {
         alert(`Barcode for ${user.username} not ready yet`);
