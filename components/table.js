@@ -10,8 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { Trash, UserPlus, PencilOff } from "lucide-react";
 
-export function TableDemo({ users, onAddUser, onModifyUser }) {
+export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
   const [isAddingUserForm, setIsAddingUserForm] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
@@ -82,6 +83,7 @@ export function TableDemo({ users, onAddUser, onModifyUser }) {
             <TableHead>Username</TableHead>
             <TableHead>Password</TableHead>
             <TableHead className="text-right">Temporary password </TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -116,16 +118,35 @@ export function TableDemo({ users, onAddUser, onModifyUser }) {
               </TableCell>
               <TableCell>{user.password}</TableCell>
               <TableCell className="text-right">NewPassword123*</TableCell>
-              <TableCell className="p-0"></TableCell>
+              <TableCell className="p-0">
+                <Button
+                  className="bg-transparent border-transparent shadow-none hover:bg-input/30 cursor-pointer"
+                  onClick={() => {
+                    onDeleteUser(index);
+                  }}
+                >
+                  <Trash color="red" />
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
       {isAddingUserForm ? addUserForm() : <div></div>}
       {isAddingUserForm ? (
-        <Button onClick={() => setIsAddingUserForm(false)}>-</Button>
+        <Button
+          className="cursor-pointer"
+          onClick={() => setIsAddingUserForm(false)}
+        >
+          <PencilOff />
+        </Button>
       ) : (
-        <Button onClick={() => setIsAddingUserForm(true)}>+</Button>
+        <Button
+          className="cursor-pointer"
+          onClick={() => setIsAddingUserForm(true)}
+        >
+          <UserPlus />
+        </Button>
       )}
     </div>
   );
