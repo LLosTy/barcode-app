@@ -115,7 +115,7 @@ function BarcodeItem({ users }) {
         <UserBarcodes key={user.id} user={user} onReady={handleReady} />
       ))}
 
-      <Button onClick={generatePDF} className="w-full">
+      <Button onClick={generatePDF} className="w-full cursor-pointer">
         Download PDF
       </Button>
     </div>
