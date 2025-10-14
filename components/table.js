@@ -71,15 +71,13 @@ export function TableDemo({ users, onAddUser, onModifyUser }) {
     );
   }
 
-  const [editingUser, setEditingUser] = useState(null);
-
   return (
     <div className={"flex flex-col gap-4 w-full max-w-7xl"}>
       <Table>
         {/* <TableCaption>A list of users.</TableCaption> */}
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">First Name</TableHead>
+            <TableHead>First Name</TableHead>
             <TableHead>Last Name</TableHead>
             <TableHead>Username</TableHead>
             <TableHead>Password</TableHead>
@@ -90,71 +88,40 @@ export function TableDemo({ users, onAddUser, onModifyUser }) {
           {users.map((user, index) => (
             <TableRow key={user.id}>
               <TableCell className="font-medium">
-                {editingUser == index ? (
-                  <Input
-                    value={user.firstName}
-                    className="w-auto"
-                    onChange={(event) => {
-                      onModifyUser("firstName", index, event.target.value);
-                    }}
-                  ></Input>
-                ) : (
-                  user.firstName
-                )}
+                <Input
+                  className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
+                  value={user.firstName}
+                  onChange={(event) => {
+                    onModifyUser("firstName", index, event.target.value);
+                  }}
+                ></Input>
               </TableCell>
               <TableCell>
-                {editingUser == index ? (
-                  <Input
-                    value={user.lastName}
-                    className="w-auto"
-                    onChange={(event) => {
-                      onModifyUser("lastName", index, event.target.value);
-                    }}
-                  ></Input>
-                ) : (
-                  user.lastName
-                )}
+                <Input
+                  className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
+                  value={user.lastName}
+                  onChange={(event) => {
+                    onModifyUser("lastName", index, event.target.value);
+                  }}
+                ></Input>
               </TableCell>
               <TableCell>
-                {editingUser == index ? (
-                  <Input
-                    value={user.username}
-                    className="w-auto"
-                    onChange={(event) => {
-                      onModifyUser("username", index, event.target.value);
-                    }}
-                  ></Input>
-                ) : (
-                  user.username
-                )}
+                <Input
+                  className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
+                  value={user.username}
+                  onChange={(event) => {
+                    onModifyUser("username", index, event.target.value);
+                  }}
+                ></Input>
               </TableCell>
               <TableCell>{user.password}</TableCell>
               <TableCell className="text-right">NewPassword123*</TableCell>
-              <TableCell className="p-0">
-                {/* if user is adding and not editing, show pencil icon */}
-                {editingUser == null ? (
-                  <Button onClick={() => setEditingUser(index)} variant="ghost">
-                    ✏️
-                  </Button>
-                ) : (
-                  <></>
-                )}
-                {editingUser == index ? (
-                  <Button onClick={() => setEditingUser(null)} variant="ghost">
-                    ❌
-                  </Button>
-                ) : (
-                  <></>
-                )}
-              </TableCell>
+              <TableCell className="p-0"></TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
       {isAddingUserForm ? addUserForm() : <div></div>}
-
-      {/* <Button onClick={onAddUser(user)}>+</Button> */}
-      {/* <Button onClick={() => onAddUser(user)}>+</Button> */}
       {isAddingUserForm ? (
         <Button onClick={() => setIsAddingUserForm(false)}>-</Button>
       ) : (

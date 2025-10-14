@@ -6,8 +6,13 @@ import "svg2pdf.js";
 import { Button } from "@/components/ui/button";
 
 function UserBarcodes({ user, onReady }) {
-  const { inputRef: usernameRef } = useBarcode({ value: user.username });
-  const { inputRef: passwordRef } = useBarcode({ value: user.password });
+  //using placeholder as to get around errors
+  const { inputRef: usernameRef } = useBarcode({
+    value: user.username || "placeholder",
+  });
+  const { inputRef: passwordRef } = useBarcode({
+    value: user.password || "placeholder",
+  });
 
   React.useEffect(() => {
     if (usernameRef.current && passwordRef.current) {
