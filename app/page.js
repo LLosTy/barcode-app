@@ -2,7 +2,7 @@
 import Barcode from "@/components/barcode";
 import { TableDemo } from "@/components/table";
 import GeneratePass from "@/lib/generatePassword";
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 
 // const users = [
 //   {
@@ -176,7 +176,6 @@ export default function Home() {
   ]);
 
   const addUser = (newUser) => {
-    console.log("new user added");
     newUser = {
       ...newUser,
       password: GeneratePass(),
@@ -190,15 +189,35 @@ export default function Home() {
     setUsers([...updatedArr]);
   };
 
+  function deleteUserByIndex(index) {
+    let updatedUserArr = users.toSpliced(index, 1);
+    setUsers([...updatedUserArr]);
+  }
+
+  function normalizeText(text) {
+    text = text.toLowerCase();
+    text = text.trim();
+    console.log(text);
+    // console.log("triggered normalizeText");
+  }
+
   return (
     // <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start"></main>
     // <TableDemo users={users} />
     // <div>
 
     <div className="font-sans grid grid-rows items-start justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2"></main>
-      <TableDemo users={users} onAddUser={addUser} onModifyUser={modifyUser} />
-      <Barcode users={users} />
+      <TableDemo
+        users={users}
+        onAddUser={addUser}
+        onModifyUser={modifyUser}
+        onDeleteUser={deleteUserByIndex}
+        normalizeText={normalizeText}
+      />
+
+      <main className="flex flex-col gap-[32px] row-start-2">
+        <Barcode users={users} />
+      </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center"></footer>
     </div>
   );

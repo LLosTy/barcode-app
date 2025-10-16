@@ -11,7 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
-export function TableDemo({ users, onAddUser, onModifyUser }) {
+export function TableDemo({
+  users,
+  onAddUser,
+  onModifyUser,
+  onDeleteUser,
+  normalizeText,
+}) {
   const [isAddingUserForm, setIsAddingUserForm] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
@@ -90,17 +96,15 @@ export function TableDemo({ users, onAddUser, onModifyUser }) {
           {users.map((user, index) => (
             <TableRow key={user.id}>
               <TableCell className="font-medium">
-                {editingUser == index ? (
-                  <Input
-                    value={user.firstName}
-                    className="w-auto"
-                    onChange={(event) => {
-                      onModifyUser("firstName", index, event.target.value);
-                    }}
-                  ></Input>
-                ) : (
-                  user.firstName
-                )}
+                <Input
+                  className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
+                  value={user.firstName}
+                  onChange={(event) => {
+                    // onModifyUser("firstName", index, event.target.value);
+                    console.log(event.target.value);
+                  }}
+                  // onBlur={() => normalizeText(user.firstName)}
+                ></Input>
               </TableCell>
               <TableCell>
                 {editingUser == index ? (
