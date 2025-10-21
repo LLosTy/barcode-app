@@ -185,9 +185,11 @@ export default function Home() {
   };
 
   const modifyUser = (property, index, change) => {
-    let updatedArr = users;
-    updatedArr[index][`${property}`] = change;
-    setUsers([...updatedArr]);
+    const updatedUsers = users.map((user, i) =>
+      i === index ? { ...user, [property]: change } : user
+    );
+
+    setUsers(updatedUsers);
   };
 
   function deleteUserByIndex(index) {
