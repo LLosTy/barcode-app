@@ -4,6 +4,7 @@ import { useBarcode } from "next-barcode";
 import { jsPDF } from "jspdf";
 import "svg2pdf.js";
 import { Button } from "@/components/ui/button";
+import { FileDown } from "lucide-react";
 
 function UserBarcodes({ user, onReady }) {
   //using placeholder as to get around errors
@@ -116,7 +117,7 @@ function BarcodeItem({ users }) {
       ))}
 
       <Button onClick={generatePDF} className="w-full cursor-pointer">
-        Download PDF
+        <FileDown />
       </Button>
     </div>
   );
