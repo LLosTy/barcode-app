@@ -9,7 +9,73 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, UserPlus, PencilOff } from "lucide-react";
+import { Trash, UserPlus, PencilOff, Check } from "lucide-react";
+
+function sanitizeFirstName(value, finalize = false) {
+  const input = String(value || "");
+  let out = "";
+  let prevSpace = false;
+  let hasInsertedSpace = false;
+  for (let i = 0; i < input.length; i += 1) {
+    const c = input[i];
+    const code = c.charCodeAt(0);
+    const isLetter = (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
+    if (isLetter) {
+      out += c;
+      prevSpace = false;
+    } else if (c === " " && !prevSpace && out.length > 0 && !hasInsertedSpace) {
+      out += " ";
+      prevSpace = true;
+      hasInsertedSpace = true;
+    }
+  }
+  if (finalize) {
+    out = out.trim();
+    const parts = out.split(" ").filter(Boolean).slice(0, 2);
+    return parts.join(" ");
+  }
+  return out;
+}
+
+function sanitizeLastNameLive(value) {
+  const input = String(value || "");
+  let out = "";
+  for (let i = 0; i < input.length; i += 1) {
+    const c = input[i];
+    const code = c.charCodeAt(0);
+    const isUpper = code >= 65 && code <= 90; // A-Z
+    const isLower = code >= 97 && code <= 122; // a-z
+    if (isUpper || isLower) {
+      out += c;
+    }
+  }
+  return out;
+}
+
+function sanitizeLastNameFinalize(value) {
+  // Trim and ensure single word letters-only
+  const live = sanitizeLastNameLive(value);
+  return live.trim();
+}
+
+function sanitizeUsernameLive(value) {
+  const input = String(value || "");
+  let out = "";
+  for (let i = 0; i < input.length; i += 1) {
+    const c = input[i];
+    const code = c.charCodeAt(0);
+    const isDigit = code >= 48 && code <= 57; // 0-9
+    if (isDigit) {
+      out += c;
+    }
+  }
+  return out;
+}
+
+function sanitizeUsernameFinalize(value) {
+  // Digits only, no spaces or special characters
+  return sanitizeUsernameLive(value);
+}
 
 const UserRow = memo(function UserRow({
   user,
@@ -34,15 +100,27 @@ const UserRow = memo(function UserRow({
   return (
     <TableRow>
       <TableCell className="font-medium">
+        {/* // TODO
+      // Trim updated user data
+      // Allowed characters only a-z A-Z and " " */}
         <Input
           className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 
                      dark:focus-visible:bg-input/30 border-transparent bg-transparent 
                      text-right shadow-none focus-visible:border dark:bg-transparent"
           value={localUser.firstName}
           onChange={(e) =>
-            setLocalUser({ ...localUser, firstName: e.target.value })
+            setLocalUser({
+              ...localUser,
+              firstName: sanitizeFirstName(e.target.value, false),
+            })
           }
-          onBlur={() => handleBlur("firstName")}
+          onBlur={() => {
+            const cleaned = sanitizeFirstName(localUser.firstName, true);
+            if (cleaned !== localUser.firstName) {
+              setLocalUser({ ...localUser, firstName: cleaned });
+            }
+            handleBlur("firstName");
+          }}
         />
       </TableCell>
       <TableCell>
@@ -52,9 +130,18 @@ const UserRow = memo(function UserRow({
                      text-right shadow-none focus-visible:border dark:bg-transparent"
           value={localUser.lastName}
           onChange={(e) =>
-            setLocalUser({ ...localUser, lastName: e.target.value })
+            setLocalUser({
+              ...localUser,
+              lastName: sanitizeLastNameLive(e.target.value),
+            })
           }
-          onBlur={() => handleBlur("lastName")}
+          onBlur={() => {
+            const cleaned = sanitizeLastNameFinalize(localUser.lastName);
+            if (cleaned !== localUser.lastName) {
+              setLocalUser({ ...localUser, lastName: cleaned });
+            }
+            handleBlur("lastName");
+          }}
         />
       </TableCell>
       <TableCell>
@@ -64,9 +151,18 @@ const UserRow = memo(function UserRow({
                      text-right shadow-none focus-visible:border dark:bg-transparent"
           value={localUser.username}
           onChange={(e) =>
-            setLocalUser({ ...localUser, username: e.target.value })
+            setLocalUser({
+              ...localUser,
+              username: sanitizeUsernameLive(e.target.value),
+            })
           }
-          onBlur={() => handleBlur("username")}
+          onBlur={() => {
+            const cleaned = sanitizeUsernameFinalize(localUser.username);
+            if (cleaned !== localUser.username) {
+              setLocalUser({ ...localUser, username: cleaned });
+            }
+            handleBlur("username");
+          }}
         />
       </TableCell>
       <TableCell>{user.password}</TableCell>
@@ -127,17 +223,50 @@ export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
           <Input
             placeholder="First Name"
             value={form.firstName}
-            onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                firstName: sanitizeFirstName(e.target.value, false),
+              })
+            }
+            onBlur={() => {
+              const cleaned = sanitizeFirstName(form.firstName, true);
+              if (cleaned !== form.firstName) {
+                setForm({ ...form, firstName: cleaned });
+              }
+            }}
           />
           <Input
             placeholder="Last Name"
             value={form.lastName}
-            onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                lastName: sanitizeLastNameLive(e.target.value),
+              })
+            }
+            onBlur={() => {
+              const cleaned = sanitizeLastNameFinalize(form.lastName);
+              if (cleaned !== form.lastName) {
+                setForm({ ...form, lastName: cleaned });
+              }
+            }}
           />
           <Input
             placeholder="Username"
             value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                username: sanitizeUsernameLive(e.target.value),
+              })
+            }
+            onBlur={() => {
+              const cleaned = sanitizeUsernameFinalize(form.username);
+              if (cleaned !== form.username) {
+                setForm({ ...form, username: cleaned });
+              }
+            }}
           />
           <Button
             variant="ghost"
@@ -151,7 +280,7 @@ export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
               });
             }}
           >
-            ✅
+            <Check color="green" />
           </Button>
         </div>
       )}
