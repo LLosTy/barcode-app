@@ -37,7 +37,7 @@ function sanitizeFirstName(value, finalize = false) {
   return out;
 }
 
-function sanitizeLastNameLive(value) {
+function sanitizeLastName(value, finalize = false) {
   const input = String(value || "");
   let out = "";
   for (let i = 0; i < input.length; i += 1) {
@@ -49,16 +49,13 @@ function sanitizeLastNameLive(value) {
       out += c;
     }
   }
+  if (finalize) {
+    return out.trim();
+  }
   return out;
 }
 
-function sanitizeLastNameFinalize(value) {
-  // Trim and ensure single word letters-only
-  const live = sanitizeLastNameLive(value);
-  return live.trim();
-}
-
-function sanitizeUsernameLive(value) {
+function sanitizeUsername(value, finalize = false) {
   const input = String(value || "");
   let out = "";
   for (let i = 0; i < input.length; i += 1) {
@@ -69,12 +66,10 @@ function sanitizeUsernameLive(value) {
       out += c;
     }
   }
+  if (finalize) {
+    return out;
+  }
   return out;
-}
-
-function sanitizeUsernameFinalize(value) {
-  // Digits only, no spaces or special characters
-  return sanitizeUsernameLive(value);
 }
 
 const UserRow = memo(function UserRow({
@@ -132,11 +127,11 @@ const UserRow = memo(function UserRow({
           onChange={(e) =>
             setLocalUser({
               ...localUser,
-              lastName: sanitizeLastNameLive(e.target.value),
+              lastName: sanitizeLastName(e.target.value, false),
             })
           }
           onBlur={() => {
-            const cleaned = sanitizeLastNameFinalize(localUser.lastName);
+            const cleaned = sanitizeLastName(localUser.lastName, true);
             if (cleaned !== localUser.lastName) {
               setLocalUser({ ...localUser, lastName: cleaned });
             }
@@ -153,11 +148,11 @@ const UserRow = memo(function UserRow({
           onChange={(e) =>
             setLocalUser({
               ...localUser,
-              username: sanitizeUsernameLive(e.target.value),
+              username: sanitizeUsername(e.target.value, false),
             })
           }
           onBlur={() => {
-            const cleaned = sanitizeUsernameFinalize(localUser.username);
+            const cleaned = sanitizeUsername(localUser.username, true);
             if (cleaned !== localUser.username) {
               setLocalUser({ ...localUser, username: cleaned });
             }
@@ -242,11 +237,11 @@ export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
             onChange={(e) =>
               setForm({
                 ...form,
-                lastName: sanitizeLastNameLive(e.target.value),
+                lastName: sanitizeLastName(e.target.value, false),
               })
             }
             onBlur={() => {
-              const cleaned = sanitizeLastNameFinalize(form.lastName);
+              const cleaned = sanitizeLastName(form.lastName, true);
               if (cleaned !== form.lastName) {
                 setForm({ ...form, lastName: cleaned });
               }
@@ -258,11 +253,11 @@ export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
             onChange={(e) =>
               setForm({
                 ...form,
-                username: sanitizeUsernameLive(e.target.value),
+                username: sanitizeUsername(e.target.value, false),
               })
             }
             onBlur={() => {
-              const cleaned = sanitizeUsernameFinalize(form.username);
+              const cleaned = sanitizeUsername(form.username, true);
               if (cleaned !== form.username) {
                 setForm({ ...form, username: cleaned });
               }
