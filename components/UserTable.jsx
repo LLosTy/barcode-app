@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import { BarcodeButton } from "@/components/Barcode";
 import { Sheet, Trash, UserPlus } from "lucide-react";
+import removeAccents from "remove-accents";
 
 const TEMP_PASSWORD = "NewPassword123*";
 
@@ -48,14 +49,16 @@ function buildCsv(users) {
 }
 
 function sanitizeFirstName(value, finalize = false) {
-  const input = String(value || "");
+  const input = removeAccents(String(value || ""));
   let out = "";
   let prevSpace = false;
   let hasInsertedSpace = false;
+
   for (let i = 0; i < input.length; i += 1) {
     const c = input[i];
     const code = c.charCodeAt(0);
     const isLetter = (code >= 65 && code <= 90) || (code >= 97 && code <= 122);
+
     if (isLetter) {
       out += c;
       prevSpace = false;
@@ -65,30 +68,32 @@ function sanitizeFirstName(value, finalize = false) {
       hasInsertedSpace = true;
     }
   }
+
   if (finalize) {
     out = out.trim();
     const parts = out.split(" ").filter(Boolean).slice(0, 2);
     return parts.join(" ");
   }
+
   return out;
 }
 
 function sanitizeLastName(value, finalize = false) {
-  const input = String(value || "");
+  const input = removeAccents(String(value || ""));
   let out = "";
+
   for (let i = 0; i < input.length; i += 1) {
     const c = input[i];
     const code = c.charCodeAt(0);
-    const isUpper = code >= 65 && code <= 90; // A-Z
-    const isLower = code >= 97 && code <= 122; // a-z
+    const isUpper = code >= 65 && code <= 90;
+    const isLower = code >= 97 && code <= 122;
+
     if (isUpper || isLower) {
       out += c;
     }
   }
-  if (finalize) {
-    return out.trim();
-  }
-  return out;
+
+  return finalize ? out.trim() : out;
 }
 
 function sanitizeUsername(value, finalize = false) {
@@ -310,7 +315,11 @@ export function UserTable({ users, onAddUser, onModifyUser, onDeleteUser }) {
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className="cursor-pointer" onClick={handleDownloadCsv} disabled={!users.length}>
+            <Button
+              className="cursor-pointer"
+              onClick={handleDownloadCsv}
+              disabled={!users.length}
+            >
               <Sheet className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
