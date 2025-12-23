@@ -1,8 +1,7 @@
 "use client";
-import Barcode from "@/components/barcode";
 import { TableDemo } from "@/components/table";
 import GeneratePass from "@/lib/generatePassword";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 // const users = [
 //   {
@@ -190,17 +189,22 @@ export default function Home() {
     setUsers([...updatedArr]);
   };
 
+  const deleteUser = (index) => {
+    setUsers((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     // <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start"></main>
     // <TableDemo users={users} />
     // <div>
 
     <div className="font-sans grid grid-rows items-start justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <TableDemo users={users} onAddUser={addUser} onModifyUser={modifyUser} />
-
-      <main className="flex flex-col gap-[32px] row-start-2">
-        <Barcode users={users} />
-      </main>
+      <TableDemo
+        users={users}
+        onAddUser={addUser}
+        onModifyUser={modifyUser}
+        onDeleteUser={deleteUser}
+      />
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center"></footer>
     </div>
   );
