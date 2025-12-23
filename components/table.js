@@ -253,13 +253,12 @@ export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
               }}
             />
             <Button
-              variant="ghost"
               onClick={() => {
                 onAddUser(form);
                 resetForm();
               }}
             >
-              <Check color="green" />
+              <Check />
             </Button>
           </div>
         )}
