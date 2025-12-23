@@ -4,6 +4,11 @@ import { useBarcode } from "next-barcode";
 import { jsPDF } from "jspdf";
 import "svg2pdf.js";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { FileDown } from "lucide-react";
 
 function UserBarcodes({ user, onReady }) {
@@ -116,9 +121,14 @@ function BarcodeItem({ users }) {
         <UserBarcodes key={user.id} user={user} onReady={handleReady} />
       ))}
 
-      <Button onClick={generatePDF} className="cursor-pointer">
-        <FileDown />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button onClick={generatePDF} className="cursor-pointer">
+            <FileDown />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Download PDF</TooltipContent>
+      </Tooltip>
     </div>
   );
 }

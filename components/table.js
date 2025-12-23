@@ -9,8 +9,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import BarcodeButton from "@/components/barcode";
-import { Trash, UserPlus, PencilOff, Check } from "lucide-react";
+import { Trash, UserPlus } from "lucide-react";
 
 function sanitizeFirstName(value, finalize = false) {
   const input = String(value || "");
@@ -176,7 +181,6 @@ const UserRow = memo(function UserRow({
 });
 
 export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
-  const [isAddingUserForm, setIsAddingUserForm] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -201,81 +205,71 @@ export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-7xl">
-      <div className="flex items-center justify-end gap-3 min-h-[56px]">
-        {isAddingUserForm && (
-          <div className="flex flex-nowrap items-center gap-2">
-            <Input
-              placeholder="First Name"
-              value={form.firstName}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  firstName: sanitizeFirstName(e.target.value, false),
-                })
+      <div className="flex flex-wrap items-center justify-end gap-3 min-h-[56px]">
+        <div className="flex flex-nowrap items-center gap-2">
+          <Input
+            placeholder="First Name"
+            value={form.firstName}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                firstName: sanitizeFirstName(e.target.value, false),
+              })
+            }
+            onBlur={() => {
+              const cleaned = sanitizeFirstName(form.firstName, true);
+              if (cleaned !== form.firstName) {
+                setForm({ ...form, firstName: cleaned });
               }
-              onBlur={() => {
-                const cleaned = sanitizeFirstName(form.firstName, true);
-                if (cleaned !== form.firstName) {
-                  setForm({ ...form, firstName: cleaned });
-                }
-              }}
-            />
-            <Input
-              placeholder="Last Name"
-              value={form.lastName}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  lastName: sanitizeLastName(e.target.value, false),
-                })
+            }}
+          />
+          <Input
+            placeholder="Last Name"
+            value={form.lastName}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                lastName: sanitizeLastName(e.target.value, false),
+              })
+            }
+            onBlur={() => {
+              const cleaned = sanitizeLastName(form.lastName, true);
+              if (cleaned !== form.lastName) {
+                setForm({ ...form, lastName: cleaned });
               }
-              onBlur={() => {
-                const cleaned = sanitizeLastName(form.lastName, true);
-                if (cleaned !== form.lastName) {
-                  setForm({ ...form, lastName: cleaned });
-                }
-              }}
-            />
-            <Input
-              placeholder="Username"
-              value={form.username}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  username: sanitizeUsername(e.target.value, false),
-                })
+            }}
+          />
+          <Input
+            placeholder="Username"
+            value={form.username}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                username: sanitizeUsername(e.target.value, false),
+              })
+            }
+            onBlur={() => {
+              const cleaned = sanitizeUsername(form.username, true);
+              if (cleaned !== form.username) {
+                setForm({ ...form, username: cleaned });
               }
-              onBlur={() => {
-                const cleaned = sanitizeUsername(form.username, true);
-                if (cleaned !== form.username) {
-                  setForm({ ...form, username: cleaned });
-                }
-              }}
-            />
-            <Button
-              onClick={() => {
-                onAddUser(form);
-                resetForm();
-              }}
-            >
-              <Check />
-            </Button>
-          </div>
-        )}
-
-        <Button
-          className="cursor-pointer"
-          onClick={() =>
-            setIsAddingUserForm((prev) => {
-              if (prev) {
-                resetForm();
-              }
-              return !prev;
-            })
-          }
-        >
-          {isAddingUserForm ? <PencilOff /> : <UserPlus />}
-        </Button>
+            }}
+          />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="cursor-pointer"
+                onClick={() => {
+                  onAddUser(form);
+                  resetForm();
+                }}
+              >
+                <UserPlus />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Add user to table</TooltipContent>
+          </Tooltip>
+        </div>
 
         <BarcodeButton users={users} />
       </div>
