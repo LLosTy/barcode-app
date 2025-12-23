@@ -15,9 +15,15 @@ function UserBarcodes({ user, onReady }) {
   //using placeholder as to get around errors
   const { inputRef: usernameRef } = useBarcode({
     value: user.username || "placeholder",
+    options: { textPosition: "top", fontSize: 40 },
   });
   const { inputRef: passwordRef } = useBarcode({
     value: user.password || "placeholder",
+    options: {
+      text: user.lastName + " " + user.firstName,
+      textPosition: "top",
+      fontSize: 40,
+    },
   });
 
   useEffect(() => {
