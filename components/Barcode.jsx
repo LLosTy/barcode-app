@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useBarcode } from "next-barcode";
 import { jsPDF } from "jspdf";
 import "svg2pdf.js";
@@ -20,7 +20,7 @@ function UserBarcodes({ user, onReady }) {
     value: user.password || "placeholder",
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (usernameRef.current && passwordRef.current) {
       onReady(user.id, {
         usernameSvg: usernameRef.current,
@@ -37,7 +37,7 @@ function UserBarcodes({ user, onReady }) {
   );
 }
 
-function BarcodeItem({ users }) {
+export function BarcodeButton({ users }) {
   const barcodeRefs = useRef({});
 
   const handleReady = (id, svgs) => {
@@ -45,6 +45,11 @@ function BarcodeItem({ users }) {
   };
 
   const generatePDF = async () => {
+    if (!users.length) {
+      alert("Add at least one user before exporting barcodes.");
+      return;
+    }
+
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -123,7 +128,11 @@ function BarcodeItem({ users }) {
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button onClick={generatePDF} className="cursor-pointer">
+          <Button
+            onClick={generatePDF}
+            className="cursor-pointer"
+            disabled={!users.length}
+          >
             <FileDown />
           </Button>
         </TooltipTrigger>
@@ -132,5 +141,3 @@ function BarcodeItem({ users }) {
     </div>
   );
 }
-
-export default BarcodeItem;

@@ -14,8 +14,38 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import BarcodeButton from "@/components/barcode";
-import { Trash, UserPlus } from "lucide-react";
+import { BarcodeButton } from "@/components/Barcode";
+import { Sheet, Trash, UserPlus } from "lucide-react";
+
+const TEMP_PASSWORD = "NewPassword123*";
+
+function escapeCsvValue(value) {
+  const str = String(value ?? "");
+  if (str.includes('"') || str.includes(",") || str.includes("\n")) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+function buildCsv(users) {
+  const headers = [
+    "First Name",
+    "Last Name",
+    "Username",
+    "Password",
+    "Temporary password",
+  ];
+  const rows = users.map((u) =>
+    [
+      escapeCsvValue(u.firstName),
+      escapeCsvValue(u.lastName),
+      escapeCsvValue(u.username),
+      escapeCsvValue(u.password),
+      escapeCsvValue(TEMP_PASSWORD),
+    ].join(",")
+  );
+  return [headers.join(","), ...rows].join("\n");
+}
 
 function sanitizeFirstName(value, finalize = false) {
   const input = String(value || "");
@@ -101,9 +131,6 @@ const UserRow = memo(function UserRow({
   return (
     <TableRow>
       <TableCell className="font-medium">
-        {/* // TODO
-      // Trim updated user data
-      // Allowed characters only a-z A-Z and " " */}
         <Input
           className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 
                      dark:focus-visible:bg-input/30 border-transparent bg-transparent 
@@ -167,7 +194,7 @@ const UserRow = memo(function UserRow({
         />
       </TableCell>
       <TableCell className="w-[200px]">{user.password}</TableCell>
-      <TableCell className="text-right w-[200px]">NewPassword123*</TableCell>
+      <TableCell className="text-right w-[200px]">{TEMP_PASSWORD}</TableCell>
       <TableCell className="p-0">
         <Button
           className="bg-transparent border-transparent shadow-none hover:bg-input/30 cursor-pointer"
@@ -180,7 +207,7 @@ const UserRow = memo(function UserRow({
   );
 });
 
-export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
+export function UserTable({ users, onAddUser, onModifyUser, onDeleteUser }) {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -202,6 +229,16 @@ export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
   // stable handler references
   const handleModifyUser = useCallback(onModifyUser, [onModifyUser]);
   const handleDeleteUser = useCallback(onDeleteUser, [onDeleteUser]);
+  const handleDownloadCsv = useCallback(() => {
+    const csv = buildCsv(users);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "users.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  }, [users]);
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-7xl">
@@ -270,6 +307,15 @@ export function TableDemo({ users, onAddUser, onModifyUser, onDeleteUser }) {
             <TooltipContent>Add user to table</TooltipContent>
           </Tooltip>
         </div>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button className="cursor-pointer" onClick={handleDownloadCsv} disabled={!users.length}>
+              <Sheet className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Download CSV</TooltipContent>
+        </Tooltip>
 
         <BarcodeButton users={users} />
       </div>
