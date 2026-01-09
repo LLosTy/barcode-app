@@ -72,7 +72,13 @@ function sanitizeFirstName(value, finalize = false) {
   if (finalize) {
     out = out.trim();
     const parts = out.split(" ").filter(Boolean).slice(0, 2);
-    return parts.join(" ");
+
+    // Capitalize first letter of each word
+    const capitalized = parts.map(
+      (part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+    );
+
+    return capitalized.join(" ");
   }
 
   return out;
@@ -93,7 +99,34 @@ function sanitizeLastName(value, finalize = false) {
     }
   }
 
-  return finalize ? out.trim() : out;
+  if (finalize) {
+    out = out.trim();
+
+    // Capitalize first letter and first letter after hyphens or spaces
+    if (out.length > 0) {
+      const separators = /[\s\-]/;
+      const parts = out.split(separators);
+      const separatorsArray = out.match(separators) || [];
+
+      let result =
+        parts[0].charAt(0).toUpperCase() + parts[0].slice(1).toLowerCase();
+
+      for (let i = 1; i < parts.length; i++) {
+        if (parts[i].length > 0) {
+          result +=
+            separatorsArray[i - 1] +
+            parts[i].charAt(0).toUpperCase() +
+            parts[i].slice(1).toLowerCase();
+        }
+      }
+
+      return result;
+    }
+
+    return out;
+  }
+
+  return out;
 }
 
 function sanitizeUsername(value, finalize = false) {
