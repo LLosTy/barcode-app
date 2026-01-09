@@ -15,6 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { BarcodeButton } from "@/components/Barcode";
+import { CopyablePassword } from "@/components/CopyablePassword";
 import { Sheet, Trash, UserPlus } from "lucide-react";
 import removeAccents from "remove-accents";
 
@@ -231,8 +232,12 @@ const UserRow = memo(function UserRow({
           }}
         />
       </TableCell>
-      <TableCell className="w-[200px]">{user.password}</TableCell>
-      <TableCell className="text-right w-[200px]">{TEMP_PASSWORD}</TableCell>
+      <TableCell className="w-[200px]">
+        <CopyablePassword password={user.password} />
+      </TableCell>
+      <TableCell className="text-right w-[200px]">
+        <CopyablePassword password={TEMP_PASSWORD} />
+      </TableCell>
       <TableCell className="p-0">
         <Button
           className="bg-transparent border-transparent shadow-none hover:bg-input/30 cursor-pointer"
