@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import { BarcodeButton } from "@/components/Barcode";
 import { CopyablePassword } from "@/components/CopyablePassword";
-import { Sheet, Trash, UserPlus } from "lucide-react";
+import { Sheet, Trash, UserPlus, Pencil, PencilOff } from "lucide-react";
 import removeAccents from "remove-accents";
 
 const TEMP_PASSWORD = "NewPassword123*";
@@ -147,9 +147,27 @@ function sanitizeUsername(value, finalize = false) {
   return out;
 }
 
+function sanitizePassword(value, finalize = false) {
+  const input = String(value || "");
+  let out = "";
+  for (let i = 0; i < input.length; i += 1) {
+    const c = input[i];
+    const code = c.charCodeAt(0);
+    const isPrintable = code >= 32 && code <= 126; // printable ASCII characters
+    if (isPrintable) {
+      out += c;
+    }
+  }
+  if (finalize) {
+    return out.trim();
+  }
+  return out;
+}
+
 const UserRow = memo(function UserRow({
   user,
   index,
+  editing,
   onModifyUser,
   onDeleteUser,
 }) {
@@ -233,10 +251,57 @@ const UserRow = memo(function UserRow({
         />
       </TableCell>
       <TableCell className="w-[200px]">
-        <CopyablePassword password={user.password} />
+        {editing ? (
+          <Input
+            className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30
+                       dark:focus-visible:bg-input/30 border-transparent bg-transparent
+                       text-right shadow-none focus-visible:border dark:bg-transparent"
+            value={localUser.password}
+            onChange={(e) =>
+              setLocalUser({
+                ...localUser,
+                password: sanitizePassword(e.target.value, false),
+              })
+            }
+            onBlur={() => {
+              const cleaned = sanitizePassword(localUser.password, true);
+              if (cleaned !== localUser.password) {
+                setLocalUser({ ...localUser, password: cleaned });
+              }
+              handleBlur("password");
+            }}
+          />
+        ) : (
+          <CopyablePassword password={user.password} />
+        )}
       </TableCell>
       <TableCell className="text-right w-[200px]">
-        <CopyablePassword password={TEMP_PASSWORD} />
+        {editing ? (
+          <Input
+            className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30
+                       dark:focus-visible:bg-input/30 border-transparent bg-transparent
+                       text-right shadow-none focus-visible:border dark:bg-transparent"
+            value={localUser.tempPassword || TEMP_PASSWORD}
+            onChange={(e) =>
+              setLocalUser({
+                ...localUser,
+                tempPassword: sanitizePassword(e.target.value, false),
+              })
+            }
+            onBlur={() => {
+              const cleaned = sanitizePassword(
+                localUser.tempPassword || TEMP_PASSWORD,
+                true
+              );
+              if (cleaned !== (localUser.tempPassword || TEMP_PASSWORD)) {
+                setLocalUser({ ...localUser, tempPassword: cleaned });
+              }
+              handleBlur("tempPassword");
+            }}
+          />
+        ) : (
+          <CopyablePassword password={TEMP_PASSWORD} />
+        )}
       </TableCell>
       <TableCell className="p-0">
         <Button
@@ -251,6 +316,7 @@ const UserRow = memo(function UserRow({
 });
 
 export function UserTable({ users, onAddUser, onModifyUser, onDeleteUser }) {
+  const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -365,6 +431,24 @@ export function UserTable({ users, onAddUser, onModifyUser, onDeleteUser }) {
         </Tooltip>
 
         <BarcodeButton users={users} />
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              className="cursor-pointer"
+              onClick={() => setEditing(!editing)}
+            >
+              {editing ? (
+                <PencilOff className="h-4 w-4" />
+              ) : (
+                <Pencil className="h-4 w-4" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {editing ? "Disable password editing" : "Enable password editing"}
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <Table>
@@ -386,6 +470,7 @@ export function UserTable({ users, onAddUser, onModifyUser, onDeleteUser }) {
               key={user.id}
               user={user}
               index={index}
+              editing={editing}
               onModifyUser={handleModifyUser}
               onDeleteUser={handleDeleteUser}
             />
